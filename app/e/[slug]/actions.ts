@@ -1,9 +1,6 @@
 "use server";
 
 import { refresh } from "next/cache";
-import { after } from "next/server";
-import { confirmationEmailsEnabled, sendConfirmationEmail } from "@/lib/confirmation-email";
-import { normalizeBaseUrl, requestOrigin } from "@/lib/origin";
 import { createPublicClient } from "@/lib/supabase/server";
 import { field, isUuid, isValidEmail } from "@/lib/validation";
 
@@ -12,8 +9,6 @@ export type SignupState = {
   message?: string;
   name?: string;
   email?: string;
-  /** True when a confirmation email is being sent. */
-  emailed?: boolean;
   /** What the person typed, so the form keeps it after an error. */
   values?: { name: string; email: string };
 };
@@ -44,14 +39,7 @@ export async function signUp(_prev: SignupState, formData: FormData): Promise<Si
 
   if (!error) {
     refresh(); // update "X of Y spots filled"
-    const emailed = confirmationEmailsEnabled();
-    if (emailed) {
-      const slug = field(formData, "slug");
-      const signupUrl = `${normalizeBaseUrl(process.env.SITE_URL ?? "") || (await requestOrigin())}/e/${slug}`;
-      // Sent after the response: a slow or failing email never affects the sign-up.
-      after(() => sendConfirmationEmail({ eventId, name, email, signupUrl }).catch((e) => console.error(e)));
-    }
-    return { status: "success", name, email, emailed, values: EMPTY };
+    return { status: "success", name, email, values: EMPTY };
   }
   if (error.code === "23505") return { status: "duplicate", email, values };
   if (error.message === "event_full") {

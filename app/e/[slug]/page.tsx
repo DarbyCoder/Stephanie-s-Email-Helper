@@ -80,7 +80,7 @@ async function EventSignup({ params }: { params: PageProps<"/e/[slug]">["params"
         {ended ? (
           <p className="text-slate-700">This event has already happened. Thanks for your interest!</p>
         ) : (
-          <SignupForm eventId={event.id} slug={event.slug} full={full} />
+          <SignupForm eventId={event.id} full={full} />
         )}
       </div>
     </article>
