@@ -5,7 +5,7 @@ import { signUp, type SignupState } from "./actions";
 
 const initialState: SignupState = { status: "idle" };
 
-export function SignupForm({ eventId, full }: { eventId: string; full: boolean }) {
+export function SignupForm({ eventId, slug, full }: { eventId: string; slug: string; full: boolean }) {
   const [state, formAction, pending] = useActionState(signUp, initialState);
   // Unique per instance: Next keeps recently visited pages mounted (hidden),
   // so a fixed id could point a label at the hidden copy of this form.
@@ -18,7 +18,10 @@ export function SignupForm({ eventId, full }: { eventId: string; full: boolean }
       {state.status === "success" ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-emerald-900" role="status">
           <p className="font-semibold">You&apos;re signed up{state.name ? `, ${state.name.split(" ")[0]}` : ""}!</p>
-          <p className="text-sm">Thanks for volunteering. We&apos;ll see you there.</p>
+          <p className="text-sm">
+            Thanks for volunteering. We&apos;ll see you there.
+            {state.emailed ? ` A confirmation email is on its way to ${state.email}.` : ""}
+          </p>
         </div>
       ) : null}
 
@@ -44,6 +47,7 @@ export function SignupForm({ eventId, full }: { eventId: string; full: boolean }
       ) : null}
 
       <input type="hidden" name="event_id" value={eventId} />
+      <input type="hidden" name="slug" value={slug} />
 
       {/* Honeypot: invisible to people (and screen readers), tempting to bots. */}
       <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">

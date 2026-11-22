@@ -102,6 +102,8 @@ or the Auth admin API, then add it to `public.admins` as above.
    - `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`: required, same values as `.env.local`.
    - `CRON_SECRET`: optional. Any long random string. Vercel Cron sends it automatically, and `/api/keepalive`
      then rejects anyone else.
+   - `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_REPLY_TO`, `SITE_URL`: optional, turn on volunteer confirmation
+     emails (see below).
    - `NOMINATIM_USER_AGENT`: optional, e.g. `StartupBoston-VolunteerHub/1.0 (https://your-site.vercel.app)`.
 3. Click **Deploy**.
 4. Open `https://<your-site>/admin`, go to **Settings**, and set **Site base URL** to the production address.
@@ -118,6 +120,21 @@ or the Auth admin API, then add it to `public.admins` as above.
   click **Open in Gmail**, or use copy / your mail app. When it's sent, click **Mark selected events as sent**.
 - **Settings**: intro, outro, signature, site base URL, and an optional Gmail account (adds `authuser=` so the
   draft opens in that account). In the intro, `{{event_count}}` becomes "THREE events" / "ONE event".
+
+## Confirmation emails (optional, Resend)
+
+When `RESEND_API_KEY` and `EMAIL_FROM` are set, each volunteer gets a plain-text confirmation with the
+event's date, time, place and link. It's sent after the sign-up response, so a slow or failing email never
+blocks or breaks a sign-up; failures show up in Vercel's logs.
+
+1. Create a free account at resend.com and go to **Domains → Add domain** (e.g. `startupboston.org`). Add the
+   DNS records it shows at your domain host and wait for "Verified".
+2. **API Keys → Create API key** with "Sending access".
+3. In Vercel, add these environment variables, then **Redeploy**:
+   - `RESEND_API_KEY=re_...`
+   - `EMAIL_FROM=Startup Boston <volunteers@startupboston.org>` (must use the verified domain)
+   - `EMAIL_REPLY_TO=you@startupboston.org`, so replies like "I can't make it" reach you
+   - `SITE_URL=https://<your-site>.vercel.app`, used for the event link in the email
 
 ## Decisions and assumptions
 
